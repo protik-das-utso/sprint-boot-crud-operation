@@ -19,7 +19,6 @@ public class StudentController {
     public String viewHomePage(Model model) {
         List<StudentModel> StudentList = studentService.getStudents();
         model.addAttribute("StudentList", StudentList);
-
         return "index";
     }
 
@@ -51,16 +50,22 @@ public class StudentController {
 
     @PostMapping("/student/update/{id}")
     public String updateStudent(@PathVariable("id") Integer id, @ModelAttribute("student") StudentModel updatedStudent){
-        StudentModel existingStudent = studentService.getStudentById(id);
-        existingStudent.setName(updatedStudent.getName());
-        existingStudent.setEmail(updatedStudent.getEmail());
-        existingStudent.setPhone(updatedStudent.getPhone());
-        existingStudent.setAddress(updatedStudent.getAddress());
-        studentService.saveStudent(existingStudent);
 
-        System.out.println("Updating student: " + existingStudent.getId());
-        System.out.println("Old name: " + existingStudent.getAddress());
-        System.out.println("Updated name: " + updatedStudent.getAddress());
+        StudentModel existingStudent = studentService.getStudentById(id);
+
+        if (existingStudent == null) {
+            System.out.println("Student not found");
+            return "redirect:/";
+        }
+        if (existingStudent.getName().equals(updatedStudent.getName()) &&
+            existingStudent.getEmail().equals(updatedStudent.getEmail()) &&
+            existingStudent.getPhone().equals(updatedStudent.getPhone()) &&
+            existingStudent.getAddress().equals(updatedStudent.getAddress())) {
+            System.out.println("No change");
+            return "redirect:/";
+        }else{
+            studentService.saveStudent(updatedStudent);
+        }
 
         return "redirect:/";
     }
